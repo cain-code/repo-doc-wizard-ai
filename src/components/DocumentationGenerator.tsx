@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Zap, Github, FileText, CheckCircle, Clock, AlertCircle, Bot, Sparkles } from 'lucide-react';
+import { Zap, Github, FileText, CheckCircle, Clock, AlertCircle, Bot, Sparkles, Rocket, Target, MessageCircle, Package, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiService } from '@/services/api';
 import { DocumentationRequest } from '@/types/api';
@@ -56,21 +56,17 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
     setProgress(0);
 
     try {
-      // Simulate progress through steps
       for (let i = 0; i < generationSteps.length; i++) {
         setCurrentStep(generationSteps[i]);
-        setProgress(((i + 1) / generationSteps.length) * 90); // 90% for visual feedback
+        setProgress(((i + 1) / generationSteps.length) * 90);
         
-        // Add realistic delays for better UX
         if (i < 4) {
           await new Promise(resolve => setTimeout(resolve, 800));
         } else if (i === generationSteps.length - 3) {
-          // AI generation step - longer delay
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
 
-      // Prepare API request
       const request: DocumentationRequest = {
         repo_url: repoUrl,
         project_description: projectDescription || undefined,
@@ -81,7 +77,6 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
         selected_components: selectedComponents
       };
 
-      // Call API
       setCurrentStep('Calling AI service...');
       const response = await ApiService.generateDocumentation(request);
 
@@ -107,60 +102,100 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Generation Configuration Summary */}
-      <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
+      <Card className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-800/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-purple-600" />
-            AI Documentation Generation
+          <CardTitle className="flex items-center gap-3 text-slate-100">
+            <div className="p-2 bg-blue-600 rounded-xl">
+              <Bot className="h-6 w-6 text-white" />
+            </div>
+            AI Documentation Generation Configuration
           </CardTitle>
+          <p className="text-slate-400">Review your settings before generating documentation</p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-700">Repository</h4>
-              <div className="flex items-center gap-2">
-                <Github className="h-4 w-4 text-gray-500" />
-                <span className="text-sm truncate">{repoUrl || 'Not specified'}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3 mb-2">
+                <Github className="h-5 w-5 text-slate-400" />
+                <h4 className="font-semibold text-slate-200">Repository</h4>
               </div>
+              <span className="text-sm text-slate-300 break-all">{repoUrl || 'Not specified'}</span>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-700">Target Audience</h4>
-              <Badge variant="secondary" className="capitalize">{targetAudience || 'Not specified'}</Badge>
+            
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3 mb-2">
+                <Target className="h-5 w-5 text-slate-400" />
+                <h4 className="font-semibold text-slate-200">Audience</h4>
+              </div>
+              <Badge variant="secondary" className="bg-slate-700 text-slate-300 capitalize">
+                {targetAudience || 'Not specified'}
+              </Badge>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-700">Tone</h4>
-              <Badge variant="outline" className="capitalize">{tone || 'Not specified'}</Badge>
+            
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3 mb-2">
+                <MessageCircle className="h-5 w-5 text-slate-400" />
+                <h4 className="font-semibold text-slate-200">Tone</h4>
+              </div>
+              <Badge variant="outline" className="border-slate-600 text-slate-300 capitalize">
+                {tone || 'Not specified'}
+              </Badge>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-700">Output Format</h4>
-              <Badge variant="default" className="capitalize">{outputFormat || 'Not specified'}</Badge>
+            
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3 mb-2">
+                <Package className="h-5 w-5 text-slate-400" />
+                <h4 className="font-semibold text-slate-200">Format</h4>
+              </div>
+              <Badge variant="default" className="bg-blue-600 text-white capitalize">
+                {outputFormat || 'Not specified'}
+              </Badge>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-700">Primary Language</h4>
-              <Badge variant="secondary" className="capitalize">{primaryLanguage || 'Auto-detect'}</Badge>
+            
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3 mb-2">
+                <Globe className="h-5 w-5 text-slate-400" />
+                <h4 className="font-semibold text-slate-200">Language</h4>
+              </div>
+              <Badge variant="secondary" className="bg-slate-700 text-slate-300 capitalize">
+                {primaryLanguage || 'Auto-detect'}
+              </Badge>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-700">Components</h4>
-              <Badge variant="outline">{selectedComponents.length} selected</Badge>
+            
+            <div className="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-3 mb-2">
+                <FileText className="h-5 w-5 text-slate-400" />
+                <h4 className="font-semibold text-slate-200">Components</h4>
+              </div>
+              <Badge variant="outline" className="border-slate-600 text-slate-300">
+                {selectedComponents.length} selected
+              </Badge>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Selected Components */}
-      <Card>
+      <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-3 text-slate-100">
+            <div className="p-2 bg-slate-800 rounded-lg">
+              <FileText className="h-5 w-5 text-purple-400" />
+            </div>
             Selected Documentation Components
           </CardTitle>
+          <p className="text-slate-400">Components that will be included in your documentation</p>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {selectedComponents.map((component) => (
-              <Badge key={component} variant="secondary" className="capitalize">
+              <Badge 
+                key={component} 
+                variant="secondary" 
+                className="bg-slate-800 text-slate-300 border border-slate-600 capitalize px-3 py-1"
+              >
                 {component.replace(/([A-Z])/g, ' $1').trim()}
               </Badge>
             ))}
@@ -170,24 +205,28 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
 
       {/* Generation Progress */}
       {isGenerating && (
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-700/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 animate-pulse text-blue-600" />
+            <CardTitle className="flex items-center gap-3 text-slate-100">
+              <Sparkles className="h-6 w-6 animate-pulse text-blue-400" />
               AI is analyzing your repository and generating documentation...
             </CardTitle>
+            <p className="text-slate-400">This process may take 30-60 seconds depending on repository complexity</p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-blue-800">{currentStep}</span>
-                <span className="text-sm text-blue-600">{Math.round(progress)}%</span>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-medium text-slate-200">{currentStep}</span>
+                <span className="text-sm text-blue-400 font-mono">{Math.round(progress)}%</span>
               </div>
-              <Progress value={progress} className="w-full" />
+              <Progress 
+                value={progress} 
+                className="w-full h-2 bg-slate-800" 
+              />
             </div>
-            <div className="flex items-center gap-2 text-sm text-blue-700">
-              <Clock className="h-4 w-4" />
-              This may take 30-60 seconds depending on repository size and complexity
+            <div className="flex items-center gap-3 text-sm text-slate-300 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+              <Clock className="h-4 w-4 text-blue-400" />
+              <span>Processing repository files and generating intelligent documentation with AI</span>
             </div>
           </CardContent>
         </Card>
@@ -199,16 +238,16 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
           onClick={handleGenerate}
           disabled={isGenerating || !repoUrl}
           size="lg"
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-4 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
         >
           {isGenerating ? (
             <>
-              <Sparkles className="h-5 w-5 animate-spin" />
+              <Sparkles className="h-6 w-6 animate-spin mr-3" />
               Generating with AI...
             </>
           ) : (
             <>
-              <Zap className="h-5 w-5" />
+              <Rocket className="h-6 w-6 mr-3" />
               Generate Documentation with AI
             </>
           )}
@@ -216,22 +255,46 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
       </div>
 
       {/* Tips */}
-      <Card className="border-green-200 bg-green-50">
+      <Card className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border-green-800/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-green-800 flex items-center gap-2">
-            <CheckCircle className="h-5 w-5" />
+          <CardTitle className="text-green-300 flex items-center gap-3">
+            <div className="p-2 bg-green-800 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-green-300" />
+            </div>
             Tips for Better AI-Generated Documentation
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-green-700">
-          <ul className="space-y-2 text-sm">
-            <li>• Ensure your repository has a clear project structure and meaningful file names</li>
-            <li>• Include package.json, requirements.txt, or similar dependency files for better technology detection</li>
-            <li>• Add meaningful commit messages for better changelog generation</li>
-            <li>• Make sure your repository is public (private repo support requires GitHub token)</li>
-            <li>• Include existing documentation that can be enhanced by AI</li>
-            <li>• The more detailed your project description, the better the AI-generated content</li>
-          </ul>
+        <CardContent className="text-green-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">•</span>
+                <span>Ensure your repository has a clear project structure and meaningful file names</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">•</span>
+                <span>Include package.json, requirements.txt, or similar dependency files</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">•</span>
+                <span>Add meaningful commit messages for better changelog generation</span>
+              </li>
+            </ul>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">•</span>
+                <span>Make sure your repository is public or provide access tokens</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">•</span>
+                <span>The more detailed your project description, the better the AI output</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">•</span>
+                <span>Include existing documentation that can be enhanced by AI</span>
+              </li>
+            </ul>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Download, Copy, Eye, Code, FileText, Share } from 'lucide-react';
+import { Download, Copy, Eye, Code, FileText, Share, TrendingUp, Hash, Type, FileCode } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface DocumentationPreviewProps {
@@ -47,59 +47,70 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
     if (navigator.share) {
       navigator.share(shareData);
     } else {
-      // Fallback - copy URL to clipboard
       navigator.clipboard.writeText(window.location.href);
       toast.success('URL copied to clipboard!');
     }
   };
 
   const renderMarkdownAsHTML = (markdown: string) => {
-    // Simple markdown to HTML converter for demo purposes
     let html = markdown
-      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-4 text-gray-800">$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-semibold mb-3 text-gray-700 border-b pb-2">$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-medium mb-2 text-gray-600">$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">$1</code>')
-      .replace(/^- (.*$)/gm, '<li class="ml-4 mb-1">• $1</li>')
-      .replace(/^\d+\. (.*$)/gm, '<li class="ml-4 mb-1">$1</li>')
-      .replace(/\n\n/g, '</p><p class="mb-4">')
-      .replace(/```([\s\S]*?)```/g, '<pre class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto mb-4"><code>$1</code></pre>');
+      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-6 text-slate-100 border-b border-slate-700 pb-3">$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-semibold mb-4 text-slate-200 mt-8">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-medium mb-3 text-slate-300 mt-6">$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-100">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-slate-300">$1</em>')
+      .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-blue-300 px-2 py-1 rounded-md text-sm font-mono">$1</code>')
+      .replace(/^- (.*$)/gm, '<li class="ml-4 mb-2 text-slate-300">• $1</li>')
+      .replace(/^\d+\. (.*$)/gm, '<li class="ml-4 mb-2 text-slate-300">$1</li>')
+      .replace(/\n\n/g, '</p><p class="mb-4 text-slate-300 leading-relaxed">')
+      .replace(/```([\s\S]*?)```/g, '<pre class="bg-slate-900 border border-slate-700 text-green-400 p-4 rounded-xl overflow-x-auto mb-6 font-mono text-sm"><code>$1</code></pre>');
 
-    return `<div class="prose max-w-none"><p class="mb-4">${html}</p></div>`;
+    return `<div class="prose prose-slate max-w-none"><p class="mb-4 text-slate-300 leading-relaxed">${html}</p></div>`;
   };
 
   if (!generatedDocs) {
     return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-600 mb-2">No Documentation Generated</h3>
-          <p className="text-gray-500">Generate documentation to see the preview here</p>
+      <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
+        <CardContent className="text-center py-16">
+          <div className="max-w-md mx-auto">
+            <div className="p-4 bg-slate-800 rounded-2xl w-fit mx-auto mb-6">
+              <FileText className="h-12 w-12 text-slate-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-200 mb-3">No Documentation Generated</h3>
+            <p className="text-slate-400 leading-relaxed">
+              Generate documentation from the Setup tab to see your professional documentation preview here
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Preview Controls */}
-      <Card>
+      <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5" />
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <CardTitle className="flex items-center gap-3 text-slate-100">
+              <div className="p-2 bg-slate-800 rounded-lg">
+                <Eye className="h-5 w-5 text-green-400" />
+              </div>
               Documentation Preview
             </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">{outputFormat || 'Markdown'}</Badge>
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="text-slate-400 border-slate-600 capitalize">
+                {outputFormat || 'Markdown'}
+              </Badge>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPreviewMode('rendered')}
-                  className={previewMode === 'rendered' ? 'bg-blue-50 border-blue-200' : ''}
+                  className={`border-slate-600 ${previewMode === 'rendered' 
+                    ? 'bg-slate-700 text-slate-100 border-slate-500' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   Rendered
@@ -108,44 +119,62 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => setPreviewMode('markdown')}
-                  className={previewMode === 'markdown' ? 'bg-blue-50 border-blue-200' : ''}
+                  className={`border-slate-600 ${previewMode === 'markdown' 
+                    ? 'bg-slate-700 text-slate-100 border-slate-500' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
                 >
                   <Code className="h-4 w-4 mr-1" />
-                  Markdown
+                  Source
                 </Button>
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2">
-            <Button onClick={handleCopyToClipboard} variant="outline" size="sm">
-              <Copy className="h-4 w-4 mr-1" />
-              Copy
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              onClick={handleCopyToClipboard} 
+              variant="outline" 
+              size="sm"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Copy to Clipboard
             </Button>
-            <Button onClick={handleDownload} variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-1" />
-              Download
+            <Button 
+              onClick={handleDownload} 
+              variant="outline" 
+              size="sm"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download File
             </Button>
-            <Button onClick={handleShare} variant="outline" size="sm">
-              <Share className="h-4 w-4 mr-1" />
-              Share
+            <Button 
+              onClick={handleShare} 
+              variant="outline" 
+              size="sm"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800"
+            >
+              <Share className="h-4 w-4 mr-2" />
+              Share URL
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Documentation Content */}
-      <Card>
+      <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
         <CardContent className="p-0">
-          <div className="max-h-[600px] overflow-y-auto">
+          <div className="max-h-[700px] overflow-y-auto">
             {previewMode === 'rendered' ? (
               <div 
-                className="p-6 prose prose-lg max-w-none"
+                className="p-8 prose prose-slate max-w-none"
                 dangerouslySetInnerHTML={{ __html: renderMarkdownAsHTML(generatedDocs) }}
               />
             ) : (
-              <pre className="p-6 text-sm font-mono bg-gray-50 whitespace-pre-wrap">
+              <pre className="p-8 text-sm font-mono bg-slate-900 text-slate-300 whitespace-pre-wrap leading-relaxed">
                 {generatedDocs}
               </pre>
             )}
@@ -154,54 +183,92 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
       </Card>
 
       {/* Export Options */}
-      <Card>
+      <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Export Options</CardTitle>
+          <CardTitle className="text-slate-100">Export & Download Options</CardTitle>
+          <p className="text-slate-400">Choose your preferred format for exporting the documentation</p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="outline" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Export as README.md
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
+            >
+              <FileText className="h-5 w-5 text-blue-400" />
+              <div className="text-left">
+                <div className="font-medium">README.md</div>
+                <div className="text-xs text-slate-500">Markdown format</div>
+              </div>
             </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Export as HTML
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
+            >
+              <FileCode className="h-5 w-5 text-orange-400" />
+              <div className="text-left">
+                <div className="font-medium">HTML</div>
+                <div className="text-xs text-slate-500">Web format</div>
+              </div>
             </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Export as PDF
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
+            >
+              <FileText className="h-5 w-5 text-red-400" />
+              <div className="text-left">
+                <div className="font-medium">PDF</div>
+                <div className="text-xs text-slate-500">Print format</div>
+              </div>
             </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Export as Docs
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
+            >
+              <FileText className="h-5 w-5 text-purple-400" />
+              <div className="text-left">
+                <div className="font-medium">Docs</div>
+                <div className="text-xs text-slate-500">Documentation site</div>
+              </div>
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Statistics */}
-      <Card>
+      <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Documentation Statistics</CardTitle>
+          <CardTitle className="text-slate-100">Documentation Analytics</CardTitle>
+          <p className="text-slate-400">Overview of your generated documentation</p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{generatedDocs.split(' ').length}</div>
-              <div className="text-sm text-gray-600">Words</div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center justify-center mb-2">
+                <Type className="h-5 w-5 text-blue-400" />
+              </div>
+              <div className="text-2xl font-bold text-slate-100">{generatedDocs.split(' ').length}</div>
+              <div className="text-sm text-slate-400">Words</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{generatedDocs.split('\n').length}</div>
-              <div className="text-sm text-gray-600">Lines</div>
+            <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center justify-center mb-2">
+                <Hash className="h-5 w-5 text-green-400" />
+              </div>
+              <div className="text-2xl font-bold text-slate-100">{generatedDocs.split('\n').length}</div>
+              <div className="text-sm text-slate-400">Lines</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{generatedDocs.length}</div>
-              <div className="text-sm text-gray-600">Characters</div>
+            <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center justify-center mb-2">
+                <TrendingUp className="h-5 w-5 text-purple-400" />
+              </div>
+              <div className="text-2xl font-bold text-slate-100">{generatedDocs.length}</div>
+              <div className="text-sm text-slate-400">Characters</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{(generatedDocs.split('```').length - 1) / 2}</div>
-              <div className="text-sm text-gray-600">Code Blocks</div>
+            <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+              <div className="flex items-center justify-center mb-2">
+                <Code className="h-5 w-5 text-orange-400" />
+              </div>
+              <div className="text-2xl font-bold text-slate-100">{Math.floor((generatedDocs.split('```').length - 1) / 2)}</div>
+              <div className="text-sm text-slate-400">Code Blocks</div>
             </div>
           </div>
         </CardContent>
