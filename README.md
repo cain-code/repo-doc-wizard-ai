@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
 
-## Project info
+# 🚀 GitDocAI - AI-Powered Documentation Generator
 
-**URL**: https://lovable.dev/projects/7e7dab7d-14b5-4d31-9dc6-2c2e29a932d0
+Generate professional, customized documentation for any GitHub repository using AI.
 
-## How can I edit this code?
+## 📁 Project Structure
 
-There are several ways of editing your application.
+```
+gitdocai/
+├── frontend/                 # React + Tailwind frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── utils/
+│   │   └── types/
+│   ├── package.json
+│   └── tailwind.config.js
+├── backend/                  # FastAPI backend
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── models/
+│   │   └── services/
+│   ├── requirements.txt
+│   └── main.py
+├── .env.example
+└── README.md
+```
 
-**Use Lovable**
+## 🛠️ Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7e7dab7d-14b5-4d31-9dc6-2c2e29a932d0) and start prompting.
+- **Frontend**: React 18 + TypeScript + Tailwind CSS + shadcn/ui
+- **Backend**: FastAPI + Python 3.9+
+- **AI**: OpenAI GPT-4
+- **Git**: GitPython
+- **Hosting**: Vercel (frontend) + Render (backend)
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Quick Start
 
-**Use your preferred IDE**
+### Backend Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cp ../.env.example .env
+# Add your OpenAI API key to .env
+uvicorn main:app --reload
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Frontend Setup
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🌐 Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+CORS_ORIGINS=http://localhost:3000,https://your-frontend-domain.com
+```
 
-**Use GitHub Codespaces**
+## 📦 Deployment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Frontend (Vercel)
+1. Push to GitHub
+2. Connect to Vercel
+3. Deploy automatically
 
-## What technologies are used for this project?
+### Backend (Render)
+1. Push to GitHub
+2. Create new Web Service on Render
+3. Connect repository
+4. Set environment variables
+5. Deploy
 
-This project is built with:
+## ✨ Features
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- 🔗 GitHub repository analysis
+- 🎨 Customizable documentation options
+- 🤖 AI-powered content generation
+- 🌙 Beautiful dark theme UI
+- 📄 Multiple export formats
+- 📊 Mermaid diagram generation
+- 📱 Mobile-responsive design
 
-## How can I deploy this project?
+## 🔧 API Endpoints
 
-Simply open [Lovable](https://lovable.dev/projects/7e7dab7d-14b5-4d31-9dc6-2c2e29a932d0) and click on Share -> Publish.
+- `POST /api/v1/generate-docs` - Generate documentation
+- `GET /api/v1/health` - Health check
 
-## Can I connect a custom domain to my Lovable project?
+## 📋 License
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+MIT License - see LICENSE file for details.
