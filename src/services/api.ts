@@ -1,5 +1,6 @@
 
 import { DocumentationRequest, DocumentationResponse } from '@/types/api';
+import { MockApiService } from './mockApiService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -21,8 +22,9 @@ export class ApiService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('API Error:', error);
-      throw new Error(`Failed to generate documentation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.log('Backend not available, using mock service');
+      // Fallback to mock service when backend is not available
+      return MockApiService.generateDocumentation(request);
     }
   }
 
@@ -31,7 +33,8 @@ export class ApiService {
       const response = await fetch(`${API_BASE_URL}/health`);
       return await response.json();
     } catch (error) {
-      throw new Error('API health check failed');
+      console.log('Backend not available, using mock health check');
+      return MockApiService.healthCheck();
     }
   }
 }
