@@ -56,28 +56,28 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
     setProgress(0);
 
     try {
-      for (let i = 0; i < generationSteps.length; i++) {
+      // Simulate progress through steps
+      for (let i = 0; i < generationSteps.length - 1; i++) {
         setCurrentStep(generationSteps[i]);
-        setProgress(((i + 1) / generationSteps.length) * 90);
-        
-        if (i < 4) {
-          await new Promise(resolve => setTimeout(resolve, 800));
-        } else if (i === generationSteps.length - 3) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
+        setProgress(((i + 1) / generationSteps.length) * 80);
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
 
+      // Build the actual API request
       const request: DocumentationRequest = {
         repo_url: repoUrl,
         project_description: projectDescription || undefined,
-        target_audience: targetAudience as any,
-        tone: tone as any,
-        output_format: outputFormat as any,
+        target_audience: (targetAudience || 'intermediate') as any,
+        tone: (tone || 'professional') as any,
+        output_format: (outputFormat || 'readme') as any,
         primary_language: primaryLanguage || undefined,
         selected_components: selectedComponents
       };
 
       setCurrentStep('Calling AI service...');
+      setProgress(90);
+
+      console.log('Making API request with:', request);
       const response = await ApiService.generateDocumentation(request);
 
       if (response.success && response.documentation) {
@@ -91,13 +91,14 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
 
     } catch (error) {
       console.error('Generation error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to generate documentation');
+      setCurrentStep('Error occurred during generation');
+      toast.error(error instanceof Error ? error.message : 'Failed to generate documentation. Please check that the backend is running and the repository URL is valid.');
     } finally {
       setIsGenerating(false);
       setTimeout(() => {
         setProgress(0);
         setCurrentStep('');
-      }, 2000);
+      }, 3000);
     }
   };
 
@@ -130,7 +131,7 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
                 <h4 className="font-semibold text-slate-200">Audience</h4>
               </div>
               <Badge variant="secondary" className="bg-slate-700 text-slate-300 capitalize">
-                {targetAudience || 'Not specified'}
+                {targetAudience || 'intermediate'}
               </Badge>
             </div>
             
@@ -140,7 +141,7 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
                 <h4 className="font-semibold text-slate-200">Tone</h4>
               </div>
               <Badge variant="outline" className="border-slate-600 text-slate-300 capitalize">
-                {tone || 'Not specified'}
+                {tone || 'professional'}
               </Badge>
             </div>
             
@@ -150,7 +151,7 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
                 <h4 className="font-semibold text-slate-200">Format</h4>
               </div>
               <Badge variant="default" className="bg-blue-600 text-white capitalize">
-                {outputFormat || 'Not specified'}
+                {outputFormat || 'readme'}
               </Badge>
             </div>
             

@@ -18,9 +18,9 @@ import DocumentationGenerator from '@/components/DocumentationGenerator';
 const Index = () => {
   const [repoUrl, setRepoUrl] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
-  const [targetAudience, setTargetAudience] = useState('');
-  const [tone, setTone] = useState('');
-  const [outputFormat, setOutputFormat] = useState('');
+  const [targetAudience, setTargetAudience] = useState('intermediate');
+  const [tone, setTone] = useState('professional');
+  const [outputFormat, setOutputFormat] = useState('readme');
   const [primaryLanguage, setPrimaryLanguage] = useState('');
   const [selectedComponents, setSelectedComponents] = useState<string[]>([
     'overview',
@@ -36,14 +36,18 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('setup');
 
   const components = [
+    { id: 'overview', label: 'Project Overview', description: 'Comprehensive introduction and purpose', checked: true },
     { id: 'readme', label: 'README.md', description: 'Complete project README', checked: true },
     { id: 'installation', label: 'Installation Instructions', description: 'Setup and installation guide', checked: true },
     { id: 'usage', label: 'Usage Examples', description: 'Code examples and tutorials', checked: true },
     { id: 'api', label: 'API Documentation', description: 'Auto-generated API docs', checked: false },
     { id: 'structure', label: 'Folder Structure', description: 'Project organization', checked: true },
     { id: 'contributing', label: 'Contribution Guide', description: 'How to contribute', checked: true },
+    { id: 'license', label: 'License Information', description: 'License details and usage rights', checked: true },
     { id: 'changelog', label: 'Auto Changelog', description: 'Git history-based changelog', checked: false },
-    { id: 'diagram', label: 'Mermaid Diagram', description: 'Architecture visualization', checked: false }
+    { id: 'technologies', label: 'Technologies Used', description: 'Detailed tech stack explanation', checked: true },
+    { id: 'comments', label: 'Code Comments', description: 'Inline documentation suggestions', checked: false },
+    { id: 'architecture', label: 'Architecture', description: 'System design and architecture overview', checked: false }
   ];
 
   const handleComponentToggle = (componentId: string) => {
@@ -54,73 +58,24 @@ const Index = () => {
     );
   };
 
-  const handleGenerateDocumentation = () => {
-    if (!repoUrl) {
-      toast.error('Please enter a GitHub repository URL');
-      return;
-    }
-
-    toast.success('Generating documentation...');
-    
-    // Simulate documentation generation
-    const mockDocs = `# 📚 Generated Documentation
-
-## 🎯 Project Overview
-${projectDescription || 'Auto-detected project description based on repository analysis.'}
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-
-### Installation
-\`\`\`bash
-git clone ${repoUrl}
-cd repo-name
-npm install
-\`\`\`
-
-### Usage
-\`\`\`javascript
-// Example usage
-import { App } from './src/App';
-
-const app = new App();
-app.run();
-\`\`\`
-
-## 📁 Project Structure
-\`\`\`
-src/
-├── components/
-│   ├── DocumentationGenerator.tsx
-│   └── DocumentationPreview.tsx
-├── pages/
-│   └── Index.tsx
-└── lib/
-    └── utils.ts
-\`\`\`
-
-## 🛠️ Technologies Used
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **Build Tool**: Vite
-- **UI Components**: Shadcn/ui
-- **Icons**: Lucide React
-
-## 🤝 Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## 📄 License
-MIT License - see LICENSE file for details.
-`;
-
-    setGeneratedDocs(mockDocs);
+  const handleDocumentationGenerated = (docs: string, metadata?: any) => {
+    setGeneratedDocs(docs);
     setActiveTab('preview');
+    console.log('Documentation generated with metadata:', metadata);
+  };
+
+  const validateGitHubUrl = (url: string) => {
+    const githubPattern = /^https:\/\/github\.com\/[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+\/?$/;
+    return githubPattern.test(url);
+  };
+
+  const handleRepoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setRepoUrl(url);
+    
+    if (url && !validateGitHubUrl(url)) {
+      toast.error('Please enter a valid GitHub repository URL (e.g., https://github.com/username/repo)');
+    }
   };
 
   return (
@@ -198,15 +153,18 @@ MIT License - see LICENSE file for details.
                 <CardContent className="space-y-6">
                   <div>
                     <Label htmlFor="repo-url" className="text-slate-300 font-medium">
-                      GitHub Repository URL
+                      GitHub Repository URL *
                     </Label>
                     <Input
                       id="repo-url"
                       placeholder="https://github.com/username/repo-name"
                       value={repoUrl}
-                      onChange={(e) => setRepoUrl(e.target.value)}
+                      onChange={handleRepoUrlChange}
                       className="mt-2 bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-500 focus:border-blue-500 rounded-xl"
                     />
+                    {repoUrl && validateGitHubUrl(repoUrl) && (
+                      <p className="text-sm text-green-400 mt-1">✓ Valid GitHub URL</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="description" className="text-slate-300 font-medium">
@@ -287,13 +245,14 @@ MIT License - see LICENSE file for details.
                   <div>
                     <Label className="text-slate-300 font-medium flex items-center gap-2">
                       <Globe className="h-4 w-4" />
-                      Primary Language
+                      Primary Language (Optional)
                     </Label>
                     <Select value={primaryLanguage} onValueChange={setPrimaryLanguage}>
                       <SelectTrigger className="mt-2 bg-slate-800 border-slate-600 text-slate-100 focus:border-blue-500 rounded-xl">
-                        <SelectValue placeholder="Select primary language" />
+                        <SelectValue placeholder="Auto-detect or select language" />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-slate-600">
+                        <SelectItem value="">Auto-detect</SelectItem>
                         <SelectItem value="javascript">JavaScript</SelectItem>
                         <SelectItem value="typescript">TypeScript</SelectItem>
                         <SelectItem value="python">Python</SelectItem>
@@ -301,6 +260,8 @@ MIT License - see LICENSE file for details.
                         <SelectItem value="java">Java</SelectItem>
                         <SelectItem value="rust">Rust</SelectItem>
                         <SelectItem value="php">PHP</SelectItem>
+                        <SelectItem value="csharp">C#</SelectItem>
+                        <SelectItem value="cpp">C++</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -319,7 +280,7 @@ MIT License - see LICENSE file for details.
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {components.map((component) => (
                     <div 
                       key={component.id} 
@@ -354,13 +315,13 @@ MIT License - see LICENSE file for details.
             {/* Generate Button */}
             <div className="flex justify-center pt-4">
               <Button
-                onClick={handleGenerateDocumentation}
-                disabled={!repoUrl}
+                onClick={() => setActiveTab('generate')}
+                disabled={!repoUrl || !validateGitHubUrl(repoUrl)}
                 size="lg"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105"
               >
                 <Zap className="h-5 w-5 mr-2" />
-                Generate Documentation with AI
+                Continue to Generate Documentation
               </Button>
             </div>
           </TabsContent>
@@ -374,7 +335,7 @@ MIT License - see LICENSE file for details.
               outputFormat={outputFormat}
               primaryLanguage={primaryLanguage}
               selectedComponents={selectedComponents}
-              onGenerate={handleGenerateDocumentation}
+              onGenerate={handleDocumentationGenerated}
             />
           </TabsContent>
 
