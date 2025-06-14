@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -128,7 +127,7 @@ MIT License - see LICENSE file for details.
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -136,27 +135,27 @@ MIT License - see LICENSE file for details.
             <div className="p-3 bg-blue-600 rounded-xl">
               <FileText className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Documentation Generator
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              GitDocAI
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Analyze GitHub repositories and generate comprehensive, professional documentation automatically
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Analyze GitHub repositories and generate comprehensive, professional documentation automatically using AI
           </p>
         </div>
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="setup" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-800 border-gray-700">
+            <TabsTrigger value="setup" className="flex items-center gap-2 data-[state=active]:bg-gray-700">
               <Settings className="h-4 w-4" />
               Setup
             </TabsTrigger>
-            <TabsTrigger value="generate" className="flex items-center gap-2">
+            <TabsTrigger value="generate" className="flex items-center gap-2 data-[state=active]:bg-gray-700">
               <Zap className="h-4 w-4" />
               Generate
             </TabsTrigger>
-            <TabsTrigger value="preview" className="flex items-center gap-2">
+            <TabsTrigger value="preview" className="flex items-center gap-2 data-[state=active]:bg-gray-700">
               <Eye className="h-4 w-4" />
               Preview
             </TabsTrigger>
@@ -165,41 +164,41 @@ MIT License - see LICENSE file for details.
           <TabsContent value="setup" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Repository Info */}
-              <Card>
+              <Card className="bg-gray-800 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Github className="h-5 w-5" />
                     📁 Repository Info
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="repo-url">GitHub Repository URL</Label>
+                    <Label htmlFor="repo-url" className="text-gray-300">GitHub Repository URL</Label>
                     <Input
                       id="repo-url"
                       placeholder="https://github.com/username/repo-name"
                       value={repoUrl}
                       onChange={(e) => setRepoUrl(e.target.value)}
-                      className="mt-1"
+                      className="mt-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="description">Project Description (Optional)</Label>
+                    <Label htmlFor="description" className="text-gray-300">Project Description (Optional)</Label>
                     <Textarea
                       id="description"
                       placeholder="Auto-detect from repo OR provide custom description"
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
-                      className="mt-1"
+                      className="mt-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     />
                   </div>
                 </CardContent>
               </Card>
 
               {/* User Preferences */}
-              <Card>
+              <Card className="bg-gray-800 border-gray-700">
                 <CardHeader>
-                  <CardTitle>✍️ User Preferences</CardTitle>
+                  <CardTitle className="text-white">✍️ User Preferences</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -265,21 +264,22 @@ MIT License - see LICENSE file for details.
             </div>
 
             {/* Components Selection */}
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle>🧩 Components to Include</CardTitle>
-                <p className="text-sm text-gray-600">Select which documentation components to generate</p>
+                <CardTitle className="text-white">🧩 Components to Include</CardTitle>
+                <p className="text-sm text-gray-400">Select which documentation components to generate</p>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {components.map((component) => (
-                    <div key={component.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div key={component.id} className="flex items-center space-x-3 p-3 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
                       <Checkbox
                         id={component.id}
                         checked={selectedComponents.includes(component.id)}
                         onCheckedChange={() => handleComponentToggle(component.id)}
+                        className="border-gray-500 data-[state=checked]:bg-blue-600"
                       />
-                      <Label htmlFor={component.id} className="flex items-center gap-2 cursor-pointer">
+                      <Label htmlFor={component.id} className="flex items-center gap-2 cursor-pointer text-gray-300">
                         <span>{component.icon}</span>
                         {component.label}
                       </Label>
@@ -313,7 +313,7 @@ MIT License - see LICENSE file for details.
 
         {/* Footer */}
         <div className="mt-12 text-center text-gray-500">
-          <Separator className="mb-4" />
+          <Separator className="mb-4 bg-gray-700" />
           <p>Built with ❤️ using React, TypeScript, and Tailwind CSS</p>
         </div>
       </div>
