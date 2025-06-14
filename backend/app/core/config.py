@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # OpenAI Configuration
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    OPENAI_API_KEY: str = "AIzaSyBlhZ2WFY69hCupvoeWLZ0oKxiwiia4jd8"
     
     # CORS Configuration
     CORS_ORIGINS: List[str] = [
