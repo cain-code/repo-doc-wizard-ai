@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Download, Copy, Eye, Code, FileText, Share, TrendingUp, Hash, Type, FileCode } from 'lucide-react';
 import { toast } from 'sonner';
+import { ExportService } from '@/services/exportService';
 
 interface DocumentationPreviewProps {
   generatedDocs: string;
@@ -24,7 +24,7 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
     toast.success('Documentation copied to clipboard!');
   };
 
-  const handleDownload = () => {
+  const handleDownloadMarkdown = () => {
     const blob = new Blob([generatedDocs], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -34,7 +34,15 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success('Documentation downloaded!');
+    toast.success('Markdown file downloaded!');
+  };
+
+  const handleExportHTML = () => {
+    ExportService.exportToHTML(generatedDocs, 'documentation');
+  };
+
+  const handleExportPDF = () => {
+    ExportService.exportToPDF(generatedDocs, 'documentation');
   };
 
   const handleShare = () => {
@@ -143,13 +151,13 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
               Copy to Clipboard
             </Button>
             <Button 
-              onClick={handleDownload} 
+              onClick={handleDownloadMarkdown} 
               variant="outline" 
               size="sm"
               className="border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800"
             >
               <Download className="h-4 w-4 mr-2" />
-              Download File
+              Download Markdown
             </Button>
             <Button 
               onClick={handleShare} 
@@ -192,6 +200,7 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button 
               variant="outline" 
+              onClick={handleDownloadMarkdown}
               className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
             >
               <FileText className="h-5 w-5 text-blue-400" />
@@ -202,6 +211,7 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
             </Button>
             <Button 
               variant="outline" 
+              onClick={handleExportHTML}
               className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
             >
               <FileCode className="h-5 w-5 text-orange-400" />
@@ -212,6 +222,7 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
             </Button>
             <Button 
               variant="outline" 
+              onClick={handleExportPDF}
               className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
             >
               <FileText className="h-5 w-5 text-red-400" />
@@ -222,12 +233,13 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
             </Button>
             <Button 
               variant="outline" 
-              className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500"
+              className="flex items-center gap-3 p-4 h-auto border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800 hover:border-slate-500 opacity-50 cursor-not-allowed"
+              disabled
             >
               <FileText className="h-5 w-5 text-purple-400" />
               <div className="text-left">
-                <div className="font-medium">Docs</div>
-                <div className="text-xs text-slate-500">Documentation site</div>
+                <div className="font-medium">Docs Site</div>
+                <div className="text-xs text-slate-500">Coming soon</div>
               </div>
             </Button>
           </div>
