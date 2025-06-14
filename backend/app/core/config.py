@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
     
-    # OpenAI Configuration
-    OPENAI_API_KEY: str = "AIzaSyBlhZ2WFY69hCupvoeWLZ0oKxiwiia4jd8"
+    # Google Gemini Configuration
+    GEMINI_API_KEY: str = "AIzaSyBlhZ2WFY69hCupvoeWLZ0oKxiwiia4jd8"
     
     # CORS Configuration
     CORS_ORIGINS: List[str] = [

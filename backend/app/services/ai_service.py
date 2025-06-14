@@ -1,36 +1,21 @@
 
-import openai
+import google.generativeai as genai
 from typing import Dict, List
 from app.core.config import settings
 from app.models.schemas import DocumentationRequest
 
 class AIService:
     def __init__(self):
-        openai.api_key = settings.OPENAI_API_KEY
-        self.client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.model = genai.GenerativeModel('gemini-pro')
     
     def generate_documentation(self, request: DocumentationRequest, repo_analysis: Dict) -> str:
-        """Generate documentation using OpenAI GPT-4"""
+        """Generate documentation using Google Gemini"""
         prompt = self._build_prompt(request, repo_analysis)
         
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert technical writer specializing in creating comprehensive, professional documentation for software projects. Generate clean, well-structured markdown documentation."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                max_tokens=4000,
-                temperature=0.7
-            )
-            
-            return response.choices[0].message.content
+            response = self.model.generate_content(prompt)
+            return response.text
         except Exception as e:
             raise Exception(f"Failed to generate documentation: {str(e)}")
     
