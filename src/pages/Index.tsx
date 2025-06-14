@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,7 @@ const Index = () => {
   const [targetAudience, setTargetAudience] = useState('intermediate');
   const [tone, setTone] = useState('professional');
   const [outputFormat, setOutputFormat] = useState('readme');
-  const [primaryLanguage, setPrimaryLanguage] = useState('');
+  const [primaryLanguage, setPrimaryLanguage] = useState('auto');
   const [selectedComponents, setSelectedComponents] = useState<string[]>([
     'overview',
     'readme',
@@ -252,7 +251,7 @@ const Index = () => {
                         <SelectValue placeholder="Auto-detect or select language" />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-slate-600">
-                        <SelectItem value="">Auto-detect</SelectItem>
+                        <SelectItem value="auto">Auto-detect</SelectItem>
                         <SelectItem value="javascript">JavaScript</SelectItem>
                         <SelectItem value="typescript">TypeScript</SelectItem>
                         <SelectItem value="python">Python</SelectItem>
@@ -333,7 +332,7 @@ const Index = () => {
               targetAudience={targetAudience}
               tone={tone}
               outputFormat={outputFormat}
-              primaryLanguage={primaryLanguage}
+              primaryLanguage={primaryLanguage === 'auto' ? '' : primaryLanguage}
               selectedComponents={selectedComponents}
               onGenerate={handleDocumentationGenerated}
             />
