@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Github, FileText, Download, Sparkles, ArrowRight, CheckCircle, Zap, Shield, Globe } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Github, FileText, Download, Sparkles, ArrowRight, CheckCircle, Zap, Shield, Globe, AlertTriangle, ArrowLeft } from "lucide-react";
 import DocumentationGenerator from "@/components/DocumentationGenerator";
 import TutorialGenerator from "@/components/TutorialGenerator";
 
@@ -20,6 +21,14 @@ const Index = () => {
 
   const handleGenerateStart = () => {
     setCurrentStep("generate");
+  };
+
+  const handleBackToInput = () => {
+    setCurrentStep("input");
+  };
+
+  const handleBackToSetup = () => {
+    setCurrentStep("setup");
   };
 
   const handleDocumentationGenerate = (docs: string, metadata?: any) => {
@@ -58,6 +67,28 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="container mx-auto px-4 py-8">
+          {/* Back Button */}
+          <div className="mb-6">
+            <Button 
+              onClick={handleBackToSetup}
+              variant="outline" 
+              className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Setup
+            </Button>
+          </div>
+
+          {/* Caution Message */}
+          <Alert className="mb-6 bg-amber-950/50 border-amber-700/50 backdrop-blur-sm">
+            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <AlertDescription className="text-amber-200">
+              <strong>Important:</strong> GitDocAI uses artificial intelligence to generate documentation and tutorials. 
+              While our AI strives for accuracy, the generated content may contain errors, omissions, or inaccuracies. 
+              Please carefully review, verify, and test all generated code and instructions before using them in production environments.
+            </AlertDescription>
+          </Alert>
+
           {activeTab === "documentation" ? (
             <DocumentationGenerator 
               repoUrl={repoUrl}
@@ -163,6 +194,18 @@ const Index = () => {
 
           {currentStep === "setup" && (
             <div className="max-w-4xl mx-auto space-y-8">
+              {/* Back Button */}
+              <div className="flex">
+                <Button 
+                  onClick={handleBackToInput}
+                  variant="outline" 
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to URL Input
+                </Button>
+              </div>
+
               {/* Tab Selection */}
               <div className="flex justify-center">
                 <div className="bg-slate-800/50 p-1 rounded-xl border border-slate-700/50 backdrop-blur-xl">
@@ -209,15 +252,7 @@ const Index = () => {
                   </CardContent>
                 </Card>
 
-                <div className="flex justify-between items-center">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setCurrentStep("input")}
-                    className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-                  >
-                    Back to URL
-                  </Button>
-                  
+                <div className="flex justify-end">
                   <Button 
                     onClick={handleGenerateStart}
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
