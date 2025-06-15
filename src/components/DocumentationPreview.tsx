@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Download, Copy, Eye, Code, FileText, Share, TrendingUp, Hash, Type, FileCode } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Download, Copy, Eye, Code, FileText, Share, TrendingUp, Hash, Type, FileCode, Edit, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { ExportService } from '@/services/exportService';
 
@@ -18,14 +20,24 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
   outputFormat
 }) => {
   const [previewMode, setPreviewMode] = useState<'rendered' | 'markdown'>('rendered');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedDocs, setEditedDocs] = useState(generatedDocs);
+
+  // Update editedDocs when generatedDocs changes (new generation)
+  React.useEffect(() => {
+    setEditedDocs(generatedDocs);
+    setIsEditing(false);
+  }, [generatedDocs]);
+
+  const currentDocs = isEditing ? editedDocs : generatedDocs;
 
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(generatedDocs);
+    navigator.clipboard.writeText(currentDocs);
     toast.success('Documentation copied to clipboard!');
   };
 
   const handleDownloadMarkdown = () => {
-    const blob = new Blob([generatedDocs], { type: 'text/markdown' });
+    const blob = new Blob([currentDocs], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -38,11 +50,11 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
   };
 
   const handleExportHTML = () => {
-    ExportService.exportToHTML(generatedDocs, 'documentation');
+    ExportService.exportToHTML(currentDocs, 'documentation');
   };
 
   const handleExportPDF = () => {
-    ExportService.exportToPDF(generatedDocs, 'documentation');
+    ExportService.exportToPDF(currentDocs, 'documentation');
   };
 
   const handleShare = () => {
@@ -58,6 +70,26 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
       navigator.clipboard.writeText(window.location.href);
       toast.success('URL copied to clipboard!');
     }
+  };
+
+  const handleStartEditing = () => {
+    setEditedDocs(generatedDocs);
+    setIsEditing(true);
+    setPreviewMode('markdown');
+    toast.info('Edit mode enabled! Make your changes and save when done.');
+  };
+
+  const handleSaveEdits = () => {
+    setIsEditing(false);
+    setPreviewMode('rendered');
+    toast.success('Changes saved! Your edited documentation is ready for download.');
+  };
+
+  const handleCancelEditing = () => {
+    setEditedDocs(generatedDocs);
+    setIsEditing(false);
+    setPreviewMode('rendered');
+    toast.info('Edit cancelled. Reverted to original documentation.');
   };
 
   const renderMarkdownAsHTML = (markdown: string) => {
@@ -105,36 +137,78 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
                 <Eye className="h-5 w-5 text-green-400" />
               </div>
               Documentation Preview
+              {isEditing && (
+                <Badge variant="outline" className="text-orange-400 border-orange-400">
+                  Editing Mode
+                </Badge>
+              )}
             </CardTitle>
             <div className="flex items-center gap-3">
               <Badge variant="outline" className="text-slate-400 border-slate-600 capitalize">
                 {outputFormat || 'Markdown'}
               </Badge>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPreviewMode('rendered')}
-                  className={`border-slate-600 ${previewMode === 'rendered' 
-                    ? 'bg-slate-700 text-slate-100 border-slate-500' 
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  }`}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  Rendered
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPreviewMode('markdown')}
-                  className={`border-slate-600 ${previewMode === 'markdown' 
-                    ? 'bg-slate-700 text-slate-100 border-slate-500' 
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  }`}
-                >
-                  <Code className="h-4 w-4 mr-1" />
-                  Source
-                </Button>
+                {!isEditing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleStartEditing}
+                    className="border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-800"
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                )}
+                {!isEditing && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPreviewMode('rendered')}
+                      className={`border-slate-600 ${previewMode === 'rendered' 
+                        ? 'bg-slate-700 text-slate-100 border-slate-500' 
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      }`}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      Rendered
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPreviewMode('markdown')}
+                      className={`border-slate-600 ${previewMode === 'markdown' 
+                        ? 'bg-slate-700 text-slate-100 border-slate-500' 
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      }`}
+                    >
+                      <Code className="h-4 w-4 mr-1" />
+                      Source
+                    </Button>
+                  </>
+                )}
+                {isEditing && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSaveEdits}
+                      className="border-green-600 text-green-400 hover:text-green-300 hover:bg-green-900/20"
+                    >
+                      <Save className="h-4 w-4 mr-1" />
+                      Save
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancelEditing}
+                      className="border-red-600 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Cancel
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -176,14 +250,23 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
       <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
         <CardContent className="p-0">
           <div className="max-h-[700px] overflow-y-auto">
-            {previewMode === 'rendered' ? (
+            {isEditing ? (
+              <div className="p-6">
+                <Textarea
+                  value={editedDocs}
+                  onChange={(e) => setEditedDocs(e.target.value)}
+                  className="min-h-[600px] bg-slate-800 border-slate-600 text-slate-100 font-mono text-sm leading-relaxed resize-none"
+                  placeholder="Edit your documentation here..."
+                />
+              </div>
+            ) : previewMode === 'rendered' ? (
               <div 
                 className="p-8 prose prose-slate max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdownAsHTML(generatedDocs) }}
+                dangerouslySetInnerHTML={{ __html: renderMarkdownAsHTML(currentDocs) }}
               />
             ) : (
               <pre className="p-8 text-sm font-mono bg-slate-900 text-slate-300 whitespace-pre-wrap leading-relaxed">
-                {generatedDocs}
+                {currentDocs}
               </pre>
             )}
           </div>
@@ -258,28 +341,28 @@ const DocumentationPreview: React.FC<DocumentationPreviewProps> = ({
               <div className="flex items-center justify-center mb-2">
                 <Type className="h-5 w-5 text-blue-400" />
               </div>
-              <div className="text-2xl font-bold text-slate-100">{generatedDocs.split(' ').length}</div>
+              <div className="text-2xl font-bold text-slate-100">{currentDocs.split(' ').length}</div>
               <div className="text-sm text-slate-400">Words</div>
             </div>
             <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
               <div className="flex items-center justify-center mb-2">
                 <Hash className="h-5 w-5 text-green-400" />
               </div>
-              <div className="text-2xl font-bold text-slate-100">{generatedDocs.split('\n').length}</div>
+              <div className="text-2xl font-bold text-slate-100">{currentDocs.split('\n').length}</div>
               <div className="text-sm text-slate-400">Lines</div>
             </div>
             <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
               <div className="flex items-center justify-center mb-2">
                 <TrendingUp className="h-5 w-5 text-purple-400" />
               </div>
-              <div className="text-2xl font-bold text-slate-100">{generatedDocs.length}</div>
+              <div className="text-2xl font-bold text-slate-100">{currentDocs.length}</div>
               <div className="text-sm text-slate-400">Characters</div>
             </div>
             <div className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
               <div className="flex items-center justify-center mb-2">
                 <Code className="h-5 w-5 text-orange-400" />
               </div>
-              <div className="text-2xl font-bold text-slate-100">{Math.floor((generatedDocs.split('```').length - 1) / 2)}</div>
+              <div className="text-2xl font-bold text-slate-100">{Math.floor((currentDocs.split('```').length - 1) / 2)}</div>
               <div className="text-sm text-slate-400">Code Blocks</div>
             </div>
           </div>
