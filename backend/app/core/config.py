@@ -2,6 +2,7 @@
 import os
 from typing import List
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 
 class Settings(BaseSettings):
     APP_NAME: str = "GitDocAI"
@@ -20,6 +21,13 @@ class Settings(BaseSettings):
     
     # GitHub Configuration
     GITHUB_TOKEN: str = os.getenv("GITHUB_TOKEN", "")
+    
+    @field_validator('CORS_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(',')]
+        return v
     
     class Config:
         env_file = ".env"
