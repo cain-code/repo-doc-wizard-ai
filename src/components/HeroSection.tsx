@@ -1,46 +1,36 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { FileText, Sparkles, Github, Download } from 'lucide-react';
+import { Sparkles, Github } from 'lucide-react';
 
 const HeroSection = () => {
   return (
-    <div className="relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-grid-slate-700/25 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
-      <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl" />
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
+    <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-3xl"></div>
+      </div>
       
-      <div className="relative container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center mb-6">
-            <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-2xl">
-              <FileText className="h-8 w-8 text-white" />
-            </div>
+      <div className="relative container mx-auto px-4 py-20 lg:py-32">
+        <div className="text-center max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-full px-4 py-2 mb-8 backdrop-blur-sm">
+            <Sparkles className="h-4 w-4 text-blue-400" />
+            <span className="text-sm text-slate-300">AI-Powered Documentation</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent mb-6 leading-tight">
-            GitDoc<span className="text-blue-400">AI</span>
+          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            Transform Your
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> GitHub </span>
+            Repository into
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> Documentation</span>
           </h1>
           
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8 leading-relaxed">
-            Transform your GitHub repositories into comprehensive, professional documentation with the power of AI. 
-            Generate beautiful docs and tutorials in minutes, not hours.
+          <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
+            Generate comprehensive documentation and tutorials for your GitHub repositories using advanced AI. 
+            Save hours of manual work and keep your docs always up-to-date.
           </p>
           
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            <Badge variant="secondary" className="px-4 py-2 bg-blue-900/30 text-blue-300 border-blue-700/50">
-              <Sparkles className="h-4 w-4 mr-2" />
-              AI-Powered
-            </Badge>
-            <Badge variant="secondary" className="px-4 py-2 bg-purple-900/30 text-purple-300 border-purple-700/50">
-              <Github className="h-4 w-4 mr-2" />
-              GitHub Integration
-            </Badge>
-            <Badge variant="secondary" className="px-4 py-2 bg-green-900/30 text-green-300 border-green-700/50">
-              <Download className="h-4 w-4 mr-2" />
-              Multiple Formats
-            </Badge>
+          <div className="flex items-center justify-center gap-2 text-slate-500 mb-12">
+            <Github className="h-5 w-5" />
+            <span className="text-sm">Works with any GitHub repository</span>
           </div>
         </div>
       </div>
