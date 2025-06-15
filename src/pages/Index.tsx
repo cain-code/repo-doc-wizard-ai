@@ -55,21 +55,25 @@ const Index = () => {
       <HeroSection />
       
       {currentStep === "input" && (
-        <UrlInputStep
-          repoUrl={repoUrl}
-          setRepoUrl={setRepoUrl}
-          onContinue={handleContinue}
-        />
+        <div className="container mx-auto px-4 py-12">
+          <UrlInputStep
+            repoUrl={repoUrl}
+            setRepoUrl={setRepoUrl}
+            onContinue={handleContinue}
+          />
+        </div>
       )}
 
       {currentStep === "setup" && (
-        <SetupStep
-          repoUrl={repoUrl}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onBack={handleBackToInput}
-          onGenerate={handleGenerateStart}
-        />
+        <div className="container mx-auto px-4 py-12">
+          <SetupStep
+            repoUrl={repoUrl}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            onBack={handleBackToInput}
+            onGenerate={handleGenerateStart}
+          />
+        </div>
       )}
 
       {currentStep === "input" && (
