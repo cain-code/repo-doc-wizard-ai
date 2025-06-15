@@ -1,6 +1,6 @@
 
 import os
-from typing import List
+from typing import List, Union
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
 
@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     # Google Gemini Configuration
     GEMINI_API_KEY: str = "AIzaSyBlhZ2WFY69hCupvoeWLZ0oKxiwiia4jd8"
     
-    # CORS Configuration
-    CORS_ORIGINS: List[str] = [
+    # CORS Configuration - Using Union to handle both string and list inputs
+    CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:3000",
         "http://localhost:5173",
         "https://gitdocai.vercel.app"
