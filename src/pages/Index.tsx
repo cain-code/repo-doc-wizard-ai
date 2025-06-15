@@ -1,12 +1,11 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Github, FileText, Download, Sparkles, ArrowRight, CheckCircle, Zap, Shield, Globe } from "lucide-react";
-import { DocumentationGenerator } from "@/components/DocumentationGenerator";
-import { TutorialGenerator } from "@/components/TutorialGenerator";
+import DocumentationGenerator from "@/components/DocumentationGenerator";
+import TutorialGenerator from "@/components/TutorialGenerator";
 
 const Index = () => {
   const [repoUrl, setRepoUrl] = useState("");
