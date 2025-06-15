@@ -22,6 +22,14 @@ const Index = () => {
     setCurrentStep("generate");
   };
 
+  const handleDocumentationGenerate = (docs: string, metadata?: any) => {
+    console.log('Documentation generated:', docs, metadata);
+  };
+
+  const handleTutorialGenerate = (tutorial: string, metadata?: any) => {
+    console.log('Tutorial generated:', tutorial, metadata);
+  };
+
   const features = [
     {
       icon: <Zap className="h-6 w-6 text-blue-400" />,
@@ -52,13 +60,22 @@ const Index = () => {
         <div className="container mx-auto px-4 py-8">
           {activeTab === "documentation" ? (
             <DocumentationGenerator 
-              repoUrl={repoUrl} 
-              onBack={() => setCurrentStep("setup")} 
+              repoUrl={repoUrl}
+              projectDescription=""
+              targetAudience="intermediate"
+              tone="professional"
+              outputFormat="readme"
+              primaryLanguage=""
+              selectedComponents={['overview', 'installation', 'usage', 'api']}
+              onGenerate={handleDocumentationGenerate}
             />
           ) : (
             <TutorialGenerator 
-              repoUrl={repoUrl} 
-              onBack={() => setCurrentStep("setup")} 
+              repoUrl={repoUrl}
+              projectDescription=""
+              targetAudience="intermediate"
+              tone="professional"
+              onGenerate={handleTutorialGenerate}
             />
           )}
         </div>
