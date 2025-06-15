@@ -1,7 +1,7 @@
-
 import os
 import tempfile
 import shutil
+import stat
 from typing import Dict, List, Optional
 from git import Repo
 from pathlib import Path
@@ -19,7 +19,7 @@ class GitHubService:
             return self.temp_dir
         except Exception as e:
             if self.temp_dir and os.path.exists(self.temp_dir):
-                shutil.rmtree(self.temp_dir)
+                self._safe_rmtree(self.temp_dir)
             raise Exception(f"Failed to clone repository: {str(e)}")
     
     def analyze_repository(self, repo_path: str) -> Dict:
@@ -239,7 +239,27 @@ class GitHubService:
         except:
             return []
     
+    def _safe_rmtree(self, path):
+        """Safely remove directory tree, handling Windows permission issues"""
+        def onerror(func, path, exc_info):
+            """
+            Error handler for ``shutil.rmtree``.
+            If the error is due to access being denied (Windows file permissions),
+            it attempts to fix the permission and retry.
+            """
+            if not os.access(path, os.W_OK):
+                # Add write permissions and retry
+                os.chmod(path, stat.S_IWUSR | stat.S_IWRITE)
+                func(path)
+            else:
+                raise
+        
+        try:
+            shutil.rmtree(path, onerror=onerror)
+        except Exception as e:
+            print(f"Warning: Could not remove temporary directory {path}: {e}")
+    
     def cleanup(self):
         """Clean up temporary directory"""
         if self.temp_dir and os.path.exists(self.temp_dir):
-            shutil.rmtree(self.temp_dir)
+            self._safe_rmtree(self.temp_dir)

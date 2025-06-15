@@ -1,4 +1,3 @@
-
 import google.generativeai as genai
 from typing import Dict, List
 from app.core.config import settings
@@ -7,7 +6,8 @@ from app.models.schemas import DocumentationRequest
 class AIService:
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-pro')
+        # Updated to use the correct model name
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
     
     def generate_documentation(self, request: DocumentationRequest, repo_analysis: Dict) -> str:
         """Generate documentation using Google Gemini"""
