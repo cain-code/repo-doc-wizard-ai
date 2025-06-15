@@ -1,400 +1,281 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { FileText, Download, Github, Zap, Settings, Eye, Folder, User, Brain, Package, Globe, BookOpen } from 'lucide-react';
-import { toast } from 'sonner';
-import DocumentationPreview from '@/components/DocumentationPreview';
-import DocumentationGenerator from '@/components/DocumentationGenerator';
-import TutorialGenerator from '@/components/TutorialGenerator';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Github, FileText, Download, Sparkles, ArrowRight, CheckCircle, Zap, Shield, Globe } from "lucide-react";
+import { DocumentationGenerator } from "@/components/DocumentationGenerator";
+import { TutorialGenerator } from "@/components/TutorialGenerator";
 
 const Index = () => {
-  const [repoUrl, setRepoUrl] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [targetAudience, setTargetAudience] = useState('intermediate');
-  const [tone, setTone] = useState('professional');
-  const [outputFormat, setOutputFormat] = useState('readme');
-  const [primaryLanguage, setPrimaryLanguage] = useState('auto');
-  const [selectedComponents, setSelectedComponents] = useState<string[]>([
-    'overview',
-    'readme',
-    'installation',
-    'usage',
-    'structure',
-    'technologies',
-    'contributing',
-    'license'
-  ]);
-  const [generatedDocs, setGeneratedDocs] = useState('');
-  const [generatedTutorial, setGeneratedTutorial] = useState('');
-  const [activeTab, setActiveTab] = useState('setup');
+  const [repoUrl, setRepoUrl] = useState("");
+  const [currentStep, setCurrentStep] = useState<"input" | "setup" | "generate">("input");
+  const [activeTab, setActiveTab] = useState<"documentation" | "tutorial">("documentation");
 
-  const components = [
-    { id: 'overview', label: 'Project Overview', description: 'Comprehensive introduction and purpose', checked: true },
-    { id: 'readme', label: 'README.md', description: 'Complete project README', checked: true },
-    { id: 'installation', label: 'Installation Instructions', description: 'Setup and installation guide', checked: true },
-    { id: 'usage', label: 'Usage Examples', description: 'Code examples and tutorials', checked: true },
-    { id: 'api', label: 'API Documentation', description: 'Auto-generated API docs', checked: false },
-    { id: 'structure', label: 'Folder Structure', description: 'Project organization', checked: true },
-    { id: 'contributing', label: 'Contribution Guide', description: 'How to contribute', checked: true },
-    { id: 'license', label: 'License Information', description: 'License details and usage rights', checked: true },
-    { id: 'changelog', label: 'Auto Changelog', description: 'Git history-based changelog', checked: false },
-    { id: 'technologies', label: 'Technologies Used', description: 'Detailed tech stack explanation', checked: true },
-    { id: 'comments', label: 'Code Comments', description: 'Inline documentation suggestions', checked: false },
-    { id: 'architecture', label: 'Architecture', description: 'System design and architecture overview', checked: false }
-  ];
-
-  const handleComponentToggle = (componentId: string) => {
-    setSelectedComponents(prev => 
-      prev.includes(componentId) 
-        ? prev.filter(id => id !== componentId)
-        : [...prev, componentId]
-    );
-  };
-
-  const handleDocumentationGenerated = (docs: string, metadata?: any) => {
-    setGeneratedDocs(docs);
-    setActiveTab('preview');
-    console.log('Documentation generated with metadata:', metadata);
-  };
-
-  const handleTutorialGenerated = (tutorial: string, metadata?: any) => {
-    setGeneratedTutorial(tutorial);
-    setActiveTab('tutorial-preview');
-    console.log('Tutorial generated with metadata:', metadata);
-  };
-
-  const validateGitHubUrl = (url: string) => {
-    const githubPattern = /^https:\/\/github\.com\/[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+\/?$/;
-    return githubPattern.test(url);
-  };
-
-  const handleRepoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value;
-    setRepoUrl(url);
-    
-    if (url && !validateGitHubUrl(url)) {
-      toast.error('Please enter a valid GitHub repository URL (e.g., https://github.com/username/repo)');
+  const handleContinue = () => {
+    if (repoUrl.trim()) {
+      setCurrentStep("setup");
     }
   };
 
+  const handleGenerateStart = () => {
+    setCurrentStep("generate");
+  };
+
+  const features = [
+    {
+      icon: <Zap className="h-6 w-6 text-blue-400" />,
+      title: "AI-Powered Analysis",
+      description: "Advanced AI analyzes your codebase structure and generates intelligent documentation"
+    },
+    {
+      icon: <Shield className="h-6 w-6 text-green-400" />,
+      title: "Enterprise Ready",
+      description: "Professional-grade documentation suitable for enterprise development teams"
+    },
+    {
+      icon: <Globe className="h-6 w-6 text-purple-400" />,
+      title: "Multiple Formats",
+      description: "Export in various formats including Markdown, PDF, and interactive HTML"
+    }
+  ];
+
+  const steps = [
+    { number: 1, title: "Enter Repository", description: "Provide your GitHub repository URL" },
+    { number: 2, title: "Configure Options", description: "Set your preferences and target audience" },
+    { number: 3, title: "Generate & Export", description: "AI creates your documentation instantly" }
+  ];
+
+  if (currentStep === "generate") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="container mx-auto px-4 py-8">
+          {activeTab === "documentation" ? (
+            <DocumentationGenerator 
+              repoUrl={repoUrl} 
+              onBack={() => setCurrentStep("setup")} 
+            />
+          ) : (
+            <TutorialGenerator 
+              repoUrl={repoUrl} 
+              onBack={() => setCurrentStep("setup")} 
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950">
-      {/* Top Navigation */}
-      <nav className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800 shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-xl">
-                <FileText className="h-6 w-6 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-grid-slate-700/25 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
+        
+        <div className="relative container mx-auto px-4 py-20">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-6">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-2xl">
+                <FileText className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                GitDocAI
-              </h1>
             </div>
-            <Badge variant="outline" className="text-slate-400 border-slate-700">
-              v1.0.0
-            </Badge>
+            
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent mb-6 leading-tight">
+              GitDoc<span className="text-blue-400">AI</span>
+            </h1>
+            
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8 leading-relaxed">
+              Transform your GitHub repositories into comprehensive, professional documentation with the power of AI. 
+              Generate beautiful docs and tutorials in minutes, not hours.
+            </p>
+            
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+              <Badge variant="secondary" className="px-4 py-2 bg-blue-900/30 text-blue-300 border-blue-700/50">
+                <Sparkles className="h-4 w-4 mr-2" />
+                AI-Powered
+              </Badge>
+              <Badge variant="secondary" className="px-4 py-2 bg-purple-900/30 text-purple-300 border-purple-700/50">
+                <Github className="h-4 w-4 mr-2" />
+                GitHub Integration
+              </Badge>
+              <Badge variant="secondary" className="px-4 py-2 bg-green-900/30 text-green-300 border-green-700/50">
+                <Download className="h-4 w-4 mr-2" />
+                Multiple Formats
+              </Badge>
+            </div>
           </div>
-        </div>
-      </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-slate-100 mb-4">
-            Generate Professional Documentation
-          </h2>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            Transform your GitHub repositories into comprehensive, AI-powered documentation 
-            with custom styling and professional formatting
-          </p>
-        </div>
-
-        {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 bg-slate-900 border border-slate-700 p-1 rounded-2xl">
-            <TabsTrigger 
-              value="setup" 
-              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
-            >
-              <Settings className="h-4 w-4" />
-              Setup
-            </TabsTrigger>
-            <TabsTrigger 
-              value="generate" 
-              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
-            >
-              <Zap className="h-4 w-4" />
-              Generate
-            </TabsTrigger>
-            <TabsTrigger 
-              value="preview" 
-              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
-            >
-              <Eye className="h-4 w-4" />
-              Preview
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tutorials" 
-              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
-            >
-              <BookOpen className="h-4 w-4" />
-              Tutorials
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tutorial-preview" 
-              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
-            >
-              <FileText className="h-4 w-4" />
-              Tutorial Preview
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="setup" className="space-y-8">
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Repository Info Card */}
-              <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-slate-100">
-                    <div className="p-2 bg-slate-800 rounded-lg">
-                      <Folder className="h-5 w-5 text-blue-400" />
-                    </div>
-                    Repository Information
-                  </CardTitle>
+          {currentStep === "input" && (
+            <div className="max-w-2xl mx-auto">
+              {/* URL Input Card */}
+              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-xl shadow-2xl">
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-2xl text-white">Get Started</CardTitle>
+                  <CardDescription className="text-slate-400">
+                    Enter your GitHub repository URL to begin generating documentation
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div>
-                    <Label htmlFor="repo-url" className="text-slate-300 font-medium">
-                      GitHub Repository URL *
-                    </Label>
+                  <div className="relative">
+                    <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                     <Input
-                      id="repo-url"
-                      placeholder="https://github.com/username/repo-name"
+                      type="url"
+                      placeholder="https://github.com/username/repository"
                       value={repoUrl}
-                      onChange={handleRepoUrlChange}
-                      className="mt-2 bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-500 focus:border-blue-500 rounded-xl"
-                    />
-                    {repoUrl && validateGitHubUrl(repoUrl) && (
-                      <p className="text-sm text-green-400 mt-1">✓ Valid GitHub URL</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="description" className="text-slate-300 font-medium">
-                      Project Description (Optional)
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Provide a custom description or leave blank for auto-detection"
-                      value={projectDescription}
-                      onChange={(e) => setProjectDescription(e.target.value)}
-                      className="mt-2 bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-500 focus:border-blue-500 rounded-xl min-h-[100px]"
+                      onChange={(e) => setRepoUrl(e.target.value)}
+                      className="pl-12 h-12 bg-slate-900/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500/20"
                     />
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* User Preferences Card */}
-              <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-3 text-slate-100">
-                    <div className="p-2 bg-slate-800 rounded-lg">
-                      <User className="h-5 w-5 text-purple-400" />
-                    </div>
-                    Customization Options
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <Label className="text-slate-300 font-medium flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Target Audience
-                    </Label>
-                    <Select value={targetAudience} onValueChange={setTargetAudience}>
-                      <SelectTrigger className="mt-2 bg-slate-800 border-slate-600 text-slate-100 focus:border-blue-500 rounded-xl">
-                        <SelectValue placeholder="Select audience level" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-600">
-                        <SelectItem value="beginner">Beginner Developers</SelectItem>
-                        <SelectItem value="intermediate">Intermediate Developers</SelectItem>
-                        <SelectItem value="advanced">Advanced Developers</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-slate-300 font-medium flex items-center gap-2">
-                      <Brain className="h-4 w-4" />
-                      Documentation Tone
-                    </Label>
-                    <Select value={tone} onValueChange={setTone}>
-                      <SelectTrigger className="mt-2 bg-slate-800 border-slate-600 text-slate-100 focus:border-blue-500 rounded-xl">
-                        <SelectValue placeholder="Select documentation tone" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-600">
-                        <SelectItem value="professional">Professional</SelectItem>
-                        <SelectItem value="friendly">Friendly</SelectItem>
-                        <SelectItem value="technical">Technical</SelectItem>
-                        <SelectItem value="fun">Fun & Engaging</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-slate-300 font-medium flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      Output Format
-                    </Label>
-                    <Select value={outputFormat} onValueChange={setOutputFormat}>
-                      <SelectTrigger className="mt-2 bg-slate-800 border-slate-600 text-slate-100 focus:border-blue-500 rounded-xl">
-                        <SelectValue placeholder="Select output format" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-600">
-                        <SelectItem value="readme">README.md</SelectItem>
-                        <SelectItem value="markdown">Full Markdown Docs</SelectItem>
-                        <SelectItem value="html">HTML</SelectItem>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-slate-300 font-medium flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
-                      Primary Language (Optional)
-                    </Label>
-                    <Select value={primaryLanguage} onValueChange={setPrimaryLanguage}>
-                      <SelectTrigger className="mt-2 bg-slate-800 border-slate-600 text-slate-100 focus:border-blue-500 rounded-xl">
-                        <SelectValue placeholder="Auto-detect or select language" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-600">
-                        <SelectItem value="auto">Auto-detect</SelectItem>
-                        <SelectItem value="javascript">JavaScript</SelectItem>
-                        <SelectItem value="typescript">TypeScript</SelectItem>
-                        <SelectItem value="python">Python</SelectItem>
-                        <SelectItem value="go">Go</SelectItem>
-                        <SelectItem value="java">Java</SelectItem>
-                        <SelectItem value="rust">Rust</SelectItem>
-                        <SelectItem value="php">PHP</SelectItem>
-                        <SelectItem value="csharp">C#</SelectItem>
-                        <SelectItem value="cpp">C++</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  
+                  <Button 
+                    onClick={handleContinue} 
+                    disabled={!repoUrl.trim()}
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    Continue to Setup
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
                 </CardContent>
               </Card>
             </div>
+          )}
 
-            {/* Components Selection */}
-            <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
-              <CardHeader className="pb-6">
-                <CardTitle className="text-slate-100 text-xl">
-                  Documentation Components
-                </CardTitle>
-                <p className="text-slate-400">
-                  Choose which sections to include in your generated documentation
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {components.map((component) => (
-                    <div 
-                      key={component.id} 
-                      className="group relative p-4 border border-slate-700 rounded-xl hover:border-slate-600 hover:bg-slate-800/50 transition-all duration-200 cursor-pointer"
-                      onClick={() => handleComponentToggle(component.id)}
+          {currentStep === "setup" && (
+            <div className="max-w-4xl mx-auto space-y-8">
+              {/* Tab Selection */}
+              <div className="flex justify-center">
+                <div className="bg-slate-800/50 p-1 rounded-xl border border-slate-700/50 backdrop-blur-xl">
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => setActiveTab("documentation")}
+                      className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                        activeTab === "documentation"
+                          ? "bg-blue-600 text-white shadow-lg"
+                          : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      }`}
                     >
-                      <div className="flex items-start space-x-3">
-                        <Checkbox
-                          id={component.id}
-                          checked={selectedComponents.includes(component.id)}
-                          onCheckedChange={() => handleComponentToggle(component.id)}
-                          className="border-slate-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 mt-0.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <Label 
-                            htmlFor={component.id} 
-                            className="font-medium text-slate-200 cursor-pointer block leading-tight"
-                          >
-                            {component.label}
-                          </Label>
-                          <p className="text-sm text-slate-400 mt-1 leading-relaxed">
-                            {component.description}
-                          </p>
+                      <FileText className="h-4 w-4 mr-2 inline" />
+                      Documentation
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("tutorial")}
+                      className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                        activeTab === "tutorial"
+                          ? "bg-purple-600 text-white shadow-lg"
+                          : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      }`}
+                    >
+                      <Sparkles className="h-4 w-4 mr-2 inline" />
+                      Tutorial
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Configuration Cards */}
+              <div className="grid gap-6">
+                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-xl shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white flex items-center">
+                      <Github className="h-5 w-5 mr-2 text-blue-400" />
+                      Repository Details
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50">
+                      <p className="text-slate-300 font-mono text-sm break-all">{repoUrl}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="flex justify-between items-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setCurrentStep("input")}
+                    className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                  >
+                    Back to URL
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleGenerateStart}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    Generate {activeTab === "documentation" ? "Documentation" : "Tutorial"}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Features Section */}
+      {currentStep === "input" && (
+        <>
+          <div className="py-20 bg-slate-900/50 backdrop-blur-sm">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-center text-white mb-12">
+                Why Choose GitDocAI?
+              </h2>
+              
+              <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {features.map((feature, index) => (
+                  <Card key={index} className="bg-slate-800/30 border-slate-700/50 backdrop-blur-xl hover:bg-slate-800/50 transition-all duration-300">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex justify-center mb-4">
+                        <div className="p-3 bg-slate-700/50 rounded-xl">
+                          {feature.icon}
                         </div>
                       </div>
+                      <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                      <p className="text-slate-400 leading-relaxed">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Process Section */}
+          <div className="py-20">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-center text-white mb-12">
+                Simple 3-Step Process
+              </h2>
+              
+              <div className="max-w-4xl mx-auto">
+                <div className="space-y-8">
+                  {steps.map((step, index) => (
+                    <div key={index} className="flex items-center space-x-6">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                          {step.number}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-white mb-2">{step.title}</h3>
+                        <p className="text-slate-400">{step.description}</p>
+                      </div>
+                      {index < steps.length - 1 && (
+                        <div className="hidden md:block">
+                          <ArrowRight className="h-6 w-6 text-slate-600" />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Generate Button */}
-            <div className="flex justify-center pt-4">
-              <Button
-                onClick={() => setActiveTab('generate')}
-                disabled={!repoUrl || !validateGitHubUrl(repoUrl)}
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105"
-              >
-                <Zap className="h-5 w-5 mr-2" />
-                Continue to Generate Documentation
-              </Button>
+              </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="generate">
-            <DocumentationGenerator
-              repoUrl={repoUrl}
-              projectDescription={projectDescription}
-              targetAudience={targetAudience}
-              tone={tone}
-              outputFormat={outputFormat}
-              primaryLanguage={primaryLanguage === 'auto' ? '' : primaryLanguage}
-              selectedComponents={selectedComponents}
-              onGenerate={handleDocumentationGenerated}
-            />
-          </TabsContent>
-
-          <TabsContent value="preview">
-            <DocumentationPreview
-              generatedDocs={generatedDocs}
-              outputFormat={outputFormat}
-            />
-          </TabsContent>
-
-          <TabsContent value="tutorials">
-            <TutorialGenerator
-              repoUrl={repoUrl}
-              projectDescription={projectDescription}
-              targetAudience={targetAudience}
-              tone={tone}
-              primaryLanguage={primaryLanguage === 'auto' ? '' : primaryLanguage}
-              onGenerate={handleTutorialGenerated}
-            />
-          </TabsContent>
-
-          <TabsContent value="tutorial-preview">
-            <DocumentationPreview
-              generatedDocs={generatedTutorial}
-              outputFormat="markdown"
-            />
-          </TabsContent>
-        </Tabs>
-
-        {/* Footer */}
-        <div className="mt-16 text-center">
-          <Separator className="mb-6 bg-slate-700" />
-          <p className="text-slate-500">
-            Built with ❤️ using React, TypeScript, and Tailwind CSS
-          </p>
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
