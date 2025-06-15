@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import DocumentationGenerator from '@/components/DocumentationGenerator';
 import TutorialGenerator from '@/components/TutorialGenerator';
+import { ApiService } from '@/services/api';
 
 interface GenerateStepProps {
   repoUrl: string;
@@ -21,6 +22,24 @@ const GenerateStep: React.FC<GenerateStepProps> = ({
   onDocumentationGenerate,
   onTutorialGenerate
 }) => {
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+
+  useEffect(() => {
+    const checkBackendStatus = async () => {
+      console.log('Checking backend status...');
+      try {
+        await ApiService.healthCheck();
+        console.log('Backend is online');
+        setBackendStatus('online');
+      } catch (error) {
+        console.error('Backend health check failed:', error);
+        setBackendStatus('offline');
+      }
+    };
+
+    checkBackendStatus();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="container mx-auto px-4 py-8">
@@ -35,6 +54,36 @@ const GenerateStep: React.FC<GenerateStepProps> = ({
             Back to Setup
           </Button>
         </div>
+
+        {/* Backend Status Alert */}
+        {backendStatus === 'offline' && (
+          <Alert className="mb-6 bg-red-950/50 border-red-700/50 backdrop-blur-sm">
+            <WifiOff className="h-4 w-4 text-red-400" />
+            <AlertDescription className="text-red-200">
+              <strong>Backend Offline:</strong> The GitDocAI backend service is not responding. 
+              Please ensure the Python backend is running on the configured API endpoint. 
+              Check the console for more details.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {backendStatus === 'online' && (
+          <Alert className="mb-6 bg-green-950/50 border-green-700/50 backdrop-blur-sm">
+            <Wifi className="h-4 w-4 text-green-400" />
+            <AlertDescription className="text-green-200">
+              <strong>Backend Online:</strong> Successfully connected to GitDocAI backend service.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {backendStatus === 'checking' && (
+          <Alert className="mb-6 bg-blue-950/50 border-blue-700/50 backdrop-blur-sm">
+            <Wifi className="h-4 w-4 text-blue-400" />
+            <AlertDescription className="text-blue-200">
+              <strong>Checking Backend:</strong> Verifying connection to GitDocAI backend service...
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Caution Message */}
         <Alert className="mb-6 bg-amber-950/50 border-amber-700/50 backdrop-blur-sm">

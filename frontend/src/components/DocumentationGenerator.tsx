@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DocumentationGeneratorProps {
   repoUrl: string;
@@ -21,28 +22,96 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
+    console.log('Starting documentation generation for:', repoUrl);
     setIsGenerating(true);
     setProgress(0);
+    setError(null);
+    setCurrentStep('Initializing...');
 
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 10;
+    try {
+      // Check if backend is reachable
+      setCurrentStep('Connecting to backend...');
+      setProgress(10);
+      
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      console.log('Using API URL:', API_BASE_URL);
+      
+      const healthResponse = await fetch(`${API_BASE_URL}/health`);
+      if (!healthResponse.ok) {
+        throw new Error(`Backend health check failed with status: ${healthResponse.status}`);
+      }
+      
+      console.log('Backend health check passed');
+      setCurrentStep('Backend connected, preparing request...');
+      setProgress(20);
+
+      // Prepare the actual generation request
+      const request = {
+        repo_url: repoUrl,
+        project_description: '',
+        target_audience: 'intermediate',
+        tone: 'professional',
+        output_format: 'readme',
+        primary_language: '',
+        selected_components: ['overview', 'installation', 'usage', 'api']
+      };
+
+      console.log('Sending documentation request:', request);
+      setCurrentStep('Sending generation request...');
+      setProgress(30);
+
+      const response = await fetch(`${API_BASE_URL}/generate-docs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
       });
-    }, 500);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      setProgress(100);
+      console.log('Response status:', response.status);
+      setCurrentStep('Processing response...');
+      setProgress(70);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data);
+      
+      setProgress(90);
+      setCurrentStep('Finalizing...');
+
+      if (data.success && data.documentation) {
+        setProgress(100);
+        setCurrentStep('Documentation generated successfully!');
+        onGenerate(data.documentation, data.metadata);
+        toast.success('Documentation generated successfully!');
+      } else {
+        throw new Error(data.error || 'Documentation generation failed');
+      }
+
+    } catch (error) {
+      console.error('Documentation generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(errorMessage);
+      setCurrentStep('Error occurred');
+      toast.error(errorMessage);
+    } finally {
       setIsGenerating(false);
-      onGenerate("# Documentation Generated\n\nThis is sample documentation content for your repository.", { format: "markdown" });
-    }, 5000);
+      setTimeout(() => {
+        if (!error) {
+          setProgress(0);
+          setCurrentStep('');
+        }
+      }, 3000);
+    }
   };
 
   return (
@@ -58,6 +127,16 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
           <p className="text-slate-300 font-mono text-sm break-all">{repoUrl}</p>
         </div>
 
+        {error && (
+          <div className="bg-red-950/50 border border-red-700/50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-red-400 mb-2">
+              <AlertCircle className="h-4 w-4" />
+              <span className="font-medium">Generation Failed</span>
+            </div>
+            <p className="text-red-200 text-sm">{error}</p>
+          </div>
+        )}
+
         {isGenerating && (
           <div className="space-y-4">
             <div className="w-full bg-slate-700 rounded-full h-2">
@@ -66,7 +145,7 @@ const DocumentationGenerator: React.FC<DocumentationGeneratorProps> = ({
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="text-slate-400 text-center">Generating documentation... {progress}%</p>
+            <p className="text-slate-400 text-center">{currentStep} ({progress}%)</p>
           </div>
         )}
 
