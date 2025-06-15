@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,10 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { FileText, Download, Github, Zap, Settings, Eye, Folder, User, Brain, Package, Globe } from 'lucide-react';
+import { FileText, Download, Github, Zap, Settings, Eye, Folder, User, Brain, Package, Globe, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import DocumentationPreview from '@/components/DocumentationPreview';
 import DocumentationGenerator from '@/components/DocumentationGenerator';
+import TutorialGenerator from '@/components/TutorialGenerator';
 
 const Index = () => {
   const [repoUrl, setRepoUrl] = useState('');
@@ -32,6 +34,7 @@ const Index = () => {
     'license'
   ]);
   const [generatedDocs, setGeneratedDocs] = useState('');
+  const [generatedTutorial, setGeneratedTutorial] = useState('');
   const [activeTab, setActiveTab] = useState('setup');
 
   const components = [
@@ -61,6 +64,12 @@ const Index = () => {
     setGeneratedDocs(docs);
     setActiveTab('preview');
     console.log('Documentation generated with metadata:', metadata);
+  };
+
+  const handleTutorialGenerated = (tutorial: string, metadata?: any) => {
+    setGeneratedTutorial(tutorial);
+    setActiveTab('tutorial-preview');
+    console.log('Tutorial generated with metadata:', metadata);
   };
 
   const validateGitHubUrl = (url: string) => {
@@ -112,7 +121,7 @@ const Index = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-slate-900 border border-slate-700 p-1 rounded-2xl">
+          <TabsList className="grid w-full grid-cols-5 mb-8 bg-slate-900 border border-slate-700 p-1 rounded-2xl">
             <TabsTrigger 
               value="setup" 
               className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
@@ -133,6 +142,20 @@ const Index = () => {
             >
               <Eye className="h-4 w-4" />
               Preview
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tutorials" 
+              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
+            >
+              <BookOpen className="h-4 w-4" />
+              Tutorials
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tutorial-preview" 
+              className="flex items-center gap-2 data-[state=active]:bg-slate-800 data-[state=active]:text-white rounded-xl py-3"
+            >
+              <FileText className="h-4 w-4" />
+              Tutorial Preview
             </TabsTrigger>
           </TabsList>
 
@@ -342,6 +365,24 @@ const Index = () => {
             <DocumentationPreview
               generatedDocs={generatedDocs}
               outputFormat={outputFormat}
+            />
+          </TabsContent>
+
+          <TabsContent value="tutorials">
+            <TutorialGenerator
+              repoUrl={repoUrl}
+              projectDescription={projectDescription}
+              targetAudience={targetAudience}
+              tone={tone}
+              primaryLanguage={primaryLanguage === 'auto' ? '' : primaryLanguage}
+              onGenerate={handleTutorialGenerated}
+            />
+          </TabsContent>
+
+          <TabsContent value="tutorial-preview">
+            <DocumentationPreview
+              generatedDocs={generatedTutorial}
+              outputFormat="markdown"
             />
           </TabsContent>
         </Tabs>

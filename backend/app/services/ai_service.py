@@ -1,3 +1,4 @@
+
 import google.generativeai as genai
 from typing import Dict, List
 from app.core.config import settings
@@ -11,7 +12,15 @@ class AIService:
     
     def generate_documentation(self, request: DocumentationRequest, repo_analysis: Dict) -> str:
         """Generate documentation using Google Gemini"""
-        prompt = self._build_comprehensive_prompt(request, repo_analysis)
+        
+        # Check if this is a tutorial request
+        is_tutorial = any(component in ['tutorial', 'code-examples', 'step-by-step'] 
+                         for component in request.selected_components)
+        
+        if is_tutorial:
+            prompt = self._build_tutorial_prompt(request, repo_analysis)
+        else:
+            prompt = self._build_comprehensive_prompt(request, repo_analysis)
         
         try:
             response = self.model.generate_content(prompt)
@@ -19,10 +28,124 @@ class AIService:
         except Exception as e:
             raise Exception(f"Failed to generate documentation: {str(e)}")
     
+    def _build_tutorial_prompt(self, request: DocumentationRequest, repo_analysis: Dict) -> str:
+        """Build AI prompt specifically for tutorial generation"""
+        
+        repo_name = repo_analysis.get("name", "Unknown Project")
+        description = repo_analysis.get("description") or request.project_description or "No description provided"
+        language = repo_analysis.get("language", "Unknown")
+        technologies = repo_analysis.get("technologies", [])
+        structure = repo_analysis.get("structure", {})
+        
+        tutorial_type = "Getting Started" if "getting-started" in request.project_description else "Advanced Tutorial"
+        
+        prompt = f"""You are a senior technical writer specializing in creating interactive, step-by-step tutorials. Create a comprehensive tutorial for the following repository:
+
+## 📁 Repository Information:
+- **Name**: {repo_name}
+- **URL**: {request.repo_url}
+- **Description**: {description}
+- **Language**: {language}
+- **Technologies**: {', '.join(technologies) if technologies else 'Auto-detecting'}
+
+## 🎯 Tutorial Requirements:
+- **Type**: {tutorial_type}
+- **Audience**: {request.target_audience.title()} developers
+- **Tone**: {request.tone.title()}
+- **Focus**: Hands-on, practical learning with real code examples
+
+## 📂 Project Structure:
+```
+{self._format_structure_detailed(structure)}
+```
+
+## 🎓 Tutorial Objectives:
+Create a comprehensive, interactive tutorial that includes:
+
+1. **Clear Learning Objectives** - What users will accomplish
+2. **Prerequisites** - Required knowledge and tools
+3. **Step-by-Step Instructions** - Numbered, actionable steps
+4. **Code Examples** - Real, executable code snippets from the repository
+5. **Explanations** - Why each step matters
+6. **Common Issues** - Troubleshooting tips
+7. **Next Steps** - What to explore after completing the tutorial
+
+## 📋 Tutorial Structure:
+
+```markdown
+# 🚀 {tutorial_type}: {repo_name}
+
+## 🎯 What You'll Learn
+[Clear learning objectives]
+
+## 📋 Prerequisites
+[Required knowledge, tools, and setup]
+
+## ⏱️ Estimated Time
+[Realistic time estimate]
+
+## 🛠️ Step-by-Step Tutorial
+
+### Step 1: [Action Title]
+**Objective**: [What this step accomplishes]
+
+[Detailed explanation]
+
+```bash
+# Command examples
+[Real commands]
+```
+
+```{language.lower()}
+// Code example from the repository
+[Actual code snippets]
+```
+
+**💡 Explanation**: [Why this step is important]
+
+**❗ Common Issues**: [Potential problems and solutions]
+
+---
+
+### Step 2: [Next Action]
+[Continue pattern...]
+
+## 🧪 Testing Your Implementation
+[How to verify everything works]
+
+## 🎉 Congratulations!
+[Summary of what was accomplished]
+
+## 🚀 Next Steps
+[Suggestions for further learning]
+
+## 🛠️ Troubleshooting
+[Common issues and solutions]
+
+## 📚 Additional Resources
+[Relevant links and documentation]
+```
+
+## 🔒 Critical Requirements:
+
+- **Real Code**: Use actual code patterns and examples from the repository
+- **Executable**: All code examples must be runnable
+- **Progressive**: Each step builds on the previous
+- **Practical**: Focus on real-world usage scenarios
+- **Beginner-Friendly**: Explain technical concepts clearly
+- **Complete**: Include all necessary commands and configurations
+- **Tested**: Provide verification steps for each major section
+
+Generate a tutorial that a {request.target_audience} developer can follow from start to finish to successfully use this project.
+"""
+        
+        return prompt
+    
     def _build_comprehensive_prompt(self, request: DocumentationRequest, repo_analysis: Dict) -> str:
         """Build comprehensive AI prompt for professional documentation generation"""
         
-        # Extract repository information
+        # ... keep existing code (extract repository information, build components section, etc.)
+        
         repo_name = repo_analysis.get("name", "Unknown Project")
         description = repo_analysis.get("description") or request.project_description or "No description provided"
         language = repo_analysis.get("language", "Unknown")
@@ -142,84 +265,4 @@ Now analyze the repository structure, technologies, and code patterns to generat
         
         return prompt
     
-    def _get_components_instructions(self, components: List[str]) -> str:
-        """Get detailed instructions for selected components"""
-        component_map = {
-            "overview": "📌 **Project Overview** - Comprehensive introduction explaining the project's purpose, goals, and target use cases",
-            "readme": "📄 **Complete README** - Professional README.md with all essential sections and clear formatting",
-            "installation": "🔧 **Installation Guide** - Detailed setup instructions for different environments and platforms",
-            "usage": "💡 **Usage Examples** - Multiple real code examples, tutorials, and common use cases",
-            "structure": "📁 **Project Structure** - Detailed explanation of folder organization and file purposes",
-            "api": "🔗 **API Documentation** - Complete API reference with endpoints, parameters, and examples",
-            "comments": "💬 **Code Documentation** - Suggestions for improving inline code documentation",
-            "technologies": "⚡ **Technology Stack** - Detailed explanation of all technologies, frameworks, and dependencies",
-            "contributing": "🤝 **Contributing Guidelines** - Comprehensive guide for contributors including setup and workflow",
-            "license": "📜 **License Information** - License details, usage rights, and legal information",
-            "changelog": "📋 **Changelog** - Version history and changes based on git commit analysis",
-            "architecture": "🏗️ **System Architecture** - Technical architecture overview with diagrams where appropriate"
-        }
-        
-        instructions = []
-        for component in components:
-            if component in component_map:
-                instructions.append(component_map[component])
-        
-        return "\n".join(instructions)
-    
-    def _get_audience_instruction(self, audience: str) -> str:
-        """Get detailed audience-specific writing instructions"""
-        instructions = {
-            "beginner": "Write for developers new to programming or this technology stack. Include detailed explanations of concepts, avoid technical jargon without explanation, provide extensive step-by-step examples, and explain the 'why' behind each step.",
-            "intermediate": "Write for developers with moderate experience. Balance technical depth with clarity, include practical examples, assume familiarity with basic programming concepts but explain domain-specific terminology.",
-            "advanced": "Write for experienced developers and architects. Be concise but comprehensive, focus on technical implementation details, architecture decisions, and advanced usage patterns. Assume strong technical background."
-        }
-        return instructions.get(audience, instructions["intermediate"])
-    
-    def _get_tone_instruction(self, tone: str) -> str:
-        """Get detailed tone-specific writing instructions"""
-        instructions = {
-            "professional": "Use formal, business-appropriate language. Be authoritative, clear, and direct. Focus on facts and technical accuracy. Use industry-standard terminology.",
-            "friendly": "Use conversational, approachable language while maintaining professionalism. Be helpful, encouraging, and supportive. Include welcoming phrases and positive reinforcement.",
-            "technical": "Use precise, technical language with deep technical detail. Focus on implementation specifics, performance considerations, and technical trade-offs. Be thorough and analytical.",
-            "fun": "Use engaging, casual language with appropriate humor and personality. Make the documentation enjoyable to read while maintaining technical accuracy. Include creative analogies where appropriate."
-        }
-        return instructions.get(tone, instructions["professional"])
-    
-    def _format_structure_detailed(self, structure: Dict, indent: int = 0) -> str:
-        """Format directory structure with detailed explanations"""
-        if not structure:
-            return "Project structure analysis not available"
-            
-        result = []
-        prefix = "  " * indent
-        
-        for key, value in structure.items():
-            if isinstance(value, dict):
-                result.append(f"{prefix}{key}/")
-                if indent < 3:  # Limit depth to avoid overwhelming output
-                    result.append(self._format_structure_detailed(value, indent + 1))
-            else:
-                result.append(f"{prefix}{key}")
-        
-        return "\n".join(filter(None, result))
-    
-    def _format_git_history_detailed(self, history: List[Dict]) -> str:
-        """Format git history with more context"""
-        if not history:
-            return "No git history available for analysis"
-        
-        formatted = []
-        formatted.append("Recent commits (showing last 10):")
-        
-        for i, commit in enumerate(history[:10], 1):
-            hash_short = commit.get('hash', 'unknown')[:8]
-            message = commit.get('message', 'No message')
-            author = commit.get('author', 'Unknown author')
-            date = commit.get('date', 'Unknown date')
-            
-            formatted.append(f"{i}. **{hash_short}** - {message}")
-            formatted.append(f"   - Author: {author}")
-            formatted.append(f"   - Date: {date}")
-            formatted.append("")
-        
-        return "\n".join(formatted)
+    # ... keep existing code (helper methods)
